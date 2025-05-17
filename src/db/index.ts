@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import * as dotenv from "dotenv";
 import { existsSync } from "fs";
 import { join } from "path";
@@ -11,6 +11,8 @@ const localEnvPath = join(process.cwd(), ".env.local");
 if (existsSync(e2eEnvPath)) dotenv.config({ path: e2eEnvPath });
 else if (existsSync(localEnvPath)) dotenv.config({ path: localEnvPath });
 
-const dbPath = process.env.DB_PATH;
-const sqlite = new Database(dbPath);
-export const db = drizzle(sqlite);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export const db = drizzle(pool);
