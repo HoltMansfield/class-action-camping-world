@@ -1,4 +1,4 @@
-import { db } from "@/db/connect";
+import { db } from "@/db/getDb";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";

@@ -2,7 +2,7 @@
 // Script to seed the E2E database with a user using Drizzle ORM (TypeScript)
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcryptjs';
-import { db } from '../src/db/connect.js';
+import { db } from '../src/db/getDb.js';
 import { users } from '../src/db/schema.js';
 
 async function seed() {

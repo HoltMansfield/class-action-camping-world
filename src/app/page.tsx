@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/db/connect";
+import { db } from "@/db/getDb";
 import { users } from "@/db/schema";
 import { count } from "drizzle-orm";
 import { cookies } from "next/headers";
