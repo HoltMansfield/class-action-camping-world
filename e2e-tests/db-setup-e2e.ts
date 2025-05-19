@@ -19,8 +19,15 @@ async function main() {
     console.log("[E2E-Setup] Migrations generated successfully");
 
     console.log("[E2E-Setup] Initializing PGlite for E2E tests");
-    // Initialize PGlite (in-memory)
-    const pgClient = new PGlite();
+    // Compute the correct WASM file URL for Node.js
+    const path = await import('path');
+    const { pathToFileURL } = await import('url');
+    const wasmPath = pathToFileURL(
+      path.join(process.cwd(), "node_modules/@electric-sql/pglite/dist/pglite.wasm")
+    ).href;
+
+    // Initialize PGlite (in-memory) with explicit WASM URL (type assertion to bypass TS error)
+    const pgClient = new PGlite({ wasmUrl: wasmPath } as any);
     await pgClient.waitReady;
     console.log("[E2E-Setup] PGlite initialized");
 

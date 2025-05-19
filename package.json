@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "db:setup:e2e": "dotenv -e .env.e2e -- node --loader ts-node/esm ./e2e-tests/db-setup-e2e.ts",
+    "db:setup:e2e": "E2E_TEST=true dotenv -e .env.e2e -- node --loader ts-node/esm ./e2e-tests/db-setup-e2e.ts",
     "db:setup": "dotenv -e .env.local -- node --loader ts-node/esm ./e2e-tests/db-setup.ts",
     "db:setup:ci": "dotenv -e .env.e2e -- node --loader ts-node/esm ./e2e-tests/db-setup.ts",
     "build": "next build",
