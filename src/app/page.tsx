@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/db/getDb";
+import { getDb } from "@/db/getDb";
 import { users } from "@/db/schema";
 import { count } from "drizzle-orm";
 import { cookies } from "next/headers";
@@ -13,6 +13,7 @@ export default async function Home() {
     redirect("/login");
   }
   // Query user count server-side
+  const db = await getDb();
   const result = await db.select({ count: count() }).from(users);
   const userCount = result[0]?.count ?? 0;
 

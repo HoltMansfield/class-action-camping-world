@@ -1,4 +1,4 @@
-import { db } from "@/db/getDb";
+import { dbPromise } from "@/db/getDb";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -19,6 +19,7 @@ export default async function RegisterPage({ searchParams }: { searchParams?: { 
     if (!email || !password) {
       redirect("/register?error=Email and password required.");
     }
+    const db = await dbPromise;
     // Check if user already exists
     const existing = await db.select().from(users).where(eq(users.email, email));
     if (existing.length > 0) {

@@ -1,4 +1,4 @@
-import { db } from "@/db/getDb";
+import { getDb } from "@/db/getDb";
 import { users } from "@/db/schema";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
@@ -18,6 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams?: { err
       redirect("/login?error=Email and password required.");
     }
     // Find user
+    const db = await getDb();
     const found = await db.select().from(users).where(eq(users.email, email));
     if (found.length === 0) {
       redirect("/login?error=Invalid credentials.");

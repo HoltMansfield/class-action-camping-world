@@ -1,8 +1,14 @@
-import * as schema from "./schema";
+/**
+ * Main database entry point that delegates to the appropriate implementation
+ * based on the environment.
+ */
 
-let neonPool: any = null;
-let dbInstance: any = null; // Will be typed after drizzle import
-let containerInstance: any = null; // Store the container instance
+import { getE2EDb } from './get-e2e-db';
+import { getNeonDb } from './get-neon-db';
+import { stopE2EDb } from './get-e2e-db';
+
+// Import implementations but with dynamic imports to prevent bundling issues
+let dbInstance: any = null;
 
 /**
  * Get database instance with proper connection based on environment
@@ -11,51 +17,24 @@ export async function getDb() {
   if (dbInstance) return dbInstance;
 
   if (process.env.E2E_TEST === "true") {
-    try {
-      const { drizzle } = await import('drizzle-orm/node-postgres');
-      const { PostgreSqlContainer } = await import("@testcontainers/postgresql");
-      const { pushSchema } = await import("drizzle-kit/api");
-
-      containerInstance = await new PostgreSqlContainer()
-        .withDatabase('testdb')
-        .withUsername('test')
-        .withPassword('test')
-        .start();
-
-      const { Client } = await import('pg');
-      const client = new Client({
-        host: containerInstance.getHost(),
-        port: containerInstance.getPort(),
-        user: containerInstance.getUsername(),
-        password: containerInstance.getPassword(),
-        database: containerInstance.getDatabase(),
-      });
-
-      await client.connect();
-      const db = drizzle(client);
-
-      // Brand new db has no schema, push all schema
-     // await pushSchema(schema, db);
-
-      dbInstance = db;
-      return dbInstance;
-    } catch (error) {
-      throw error;
-    }
+    // For E2E tests, use TestContainers PostgreSQL
+    dbInstance = await getE2EDb();
   } else {
-    try {
-      console.log("[Database] Connecting to Neon PostgreSQL");
-      const { drizzle } = await import("drizzle-orm/neon-serverless");
-      const { Pool } = await import("@neondatabase/serverless");
-      if (!neonPool) {
-        neonPool = new Pool({ connectionString: process.env.DB_URL! });
-      }
-      dbInstance = drizzle(neonPool, { schema });
-      return dbInstance;
-    } catch (error) {
-      console.error("[Database] Error initializing Neon connection:", error);
-      throw error;
-    }
+    // For regular development/production, use Neon PostgreSQL
+    dbInstance = await getNeonDb();
+  }
+
+  return dbInstance;
+}
+
+/**
+ * Stop the database and clean up resources
+ * Call this function in your Playwright global teardown
+ */
+export async function stopDb() {
+  if (process.env.E2E_TEST === "true" && dbInstance) {
+    await stopE2EDb();
+    dbInstance = null;
   }
 }
 
