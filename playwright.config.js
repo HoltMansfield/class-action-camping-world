@@ -5,8 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e-tests',
-  // globalSetup: './e2e-tests/global-setup.ts',
-  globalTeardown: './e2e-tests/global-teardown.js',
+  globalSetup: './e2e-tests/global-setup.mjs',
+  globalTeardown: './e2e-tests/global-teardown.mjs',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
