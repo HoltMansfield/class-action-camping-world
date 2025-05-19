@@ -1,48 +1,36 @@
-import { pushSchema } from "drizzle-kit/api";
-import * as schema from "../src/db/schema.ts";
-import type { PgDatabase } from 'drizzle-orm/pg-core';
+import { migrate } from "drizzle-orm/pglite/migrator";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
+import { spawnSync } from "child_process";
 
-/**
- * Setup the E2E test database schema
- * This is separated from the main getDb.ts to avoid module loading issues
- */
-export async function setupE2DSchema(db: PgDatabase<any>): Promise<void> {
-  try {
-    console.log("[E2D-Setup] Pushing schema to PGlite database");
-    await pushSchema(schema, db);
-    console.log("[E2D-Setup] Schema push completed successfully");
-  } catch (error) {
-    console.error("[E2D-Setup] Error pushing schema:", error);
-    throw error;
-  }
-}
-
-/**
- * Initialize PGlite and setup the schema
- * This function is called directly when this file is executed as a script
- */
 async function main() {
   try {
+    // Generate migrations before running them
+    console.log("[E2E-Setup] Generating migrations with drizzle-kit");
+    const genResult = spawnSync("npx", [
+      "drizzle-kit",
+      "generate",
+      "--config",
+      "./drizzle-e2e.config.ts"
+    ], { stdio: "inherit", shell: true });
+    if (genResult.status !== 0) {
+      throw new Error(`[E2E-Setup] drizzle-kit generate failed with exit code ${genResult.status}`);
+    }
+    console.log("[E2E-Setup] Migrations generated successfully");
+
     console.log("[E2E-Setup] Initializing PGlite for E2E tests");
-    
-    // Initialize PGlite
-    const pgClient = new PGlite({
-      dataDir: "memory://",
-    });
-    
+    // Initialize PGlite (in-memory)
+    const pgClient = new PGlite();
     await pgClient.waitReady;
     console.log("[E2E-Setup] PGlite initialized");
-    
+
     // Create Drizzle instance
-    const db = drizzle(pgClient, { schema });
-    
-    // Push schema to database
-    // Use type assertion to any to bridge the incompatible types
-    await setupE2DSchema(db as any);
-    
-    console.log("[E2E-Setup] Database setup completed successfully");
+    const db = drizzle(pgClient);
+
+    // Run migrations
+    console.log("[E2E-Setup] Running migrations for E2E DB");
+    await migrate(db, { migrationsFolder: "./drizzle/e2e-migrations" });
+    console.log("[E2E-Setup] Database migrations completed successfully");
     process.exit(0);
   } catch (error) {
     console.error("[E2E-Setup] Setup failed:", error);
@@ -50,5 +38,4 @@ async function main() {
   }
 }
 
-// Run the main function when this file is executed directly
 main();

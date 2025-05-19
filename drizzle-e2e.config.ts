@@ -6,7 +6,7 @@ const isE2ETest = process.env.E2E_TEST === 'true';
 // Define the configuration
 const config: Config = {
   schema: "./src/db/schema.ts",
-  out: "./drizzle/migrations",
+  out: "./drizzle/e2e-migrations",
   dialect: "postgresql",
   // Use different database credentials based on environment
   dbCredentials: isE2ETest
