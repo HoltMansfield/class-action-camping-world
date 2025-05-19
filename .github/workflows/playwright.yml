@@ -23,6 +23,7 @@ jobs:
     - name: Create .env.e2e
       run: |
         echo "DB_URL=${{ secrets.DB_URL }}" > .env.e2e
+        echo "E2E_TEST=true" >> .env.e2e
         # Add more secrets here as needed
         # echo "OTHER_SECRET=${{ secrets.OTHER_SECRET }}" >> .env.e2e
         chmod 600 .env.e2e
