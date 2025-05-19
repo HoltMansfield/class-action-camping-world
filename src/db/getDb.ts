@@ -1,8 +1,8 @@
 import * as schema from "./schema";
 
-// Create a singleton pattern for database connections
 let neonPool: any = null;
 let dbInstance: any = null; // Will be typed after drizzle import
+let containerInstance: any = null; // Store the container instance
 
 /**
  * Get database instance with proper connection based on environment
@@ -14,7 +14,9 @@ export async function getDb() {
     try {
       const { drizzle } = await import('drizzle-orm/node-postgres');
       const { PostgreSqlContainer } = await import("@testcontainers/postgresql");
-      const container = await new PostgreSqlContainer()
+      const { pushSchema } = await import("drizzle-kit/api");
+
+      containerInstance = await new PostgreSqlContainer()
         .withDatabase('testdb')
         .withUsername('test')
         .withPassword('test')
@@ -22,15 +24,19 @@ export async function getDb() {
 
       const { Client } = await import('pg');
       const client = new Client({
-        host: container.getHost(),
-        port: container.getPort(),
-        user: container.getUsername(),
-        password: container.getPassword(),
-        database: container.getDatabase(),
+        host: containerInstance.getHost(),
+        port: containerInstance.getPort(),
+        user: containerInstance.getUsername(),
+        password: containerInstance.getPassword(),
+        database: containerInstance.getDatabase(),
       });
 
       await client.connect();
       const db = drizzle(client);
+
+      // Brand new db has no schema, push all schema
+     // await pushSchema(schema, db);
+
       dbInstance = db;
       return dbInstance;
     } catch (error) {
