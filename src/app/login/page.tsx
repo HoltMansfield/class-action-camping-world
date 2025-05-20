@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams?: { err
     if (!email || !password) {
       redirect("/login?error=Email and password required.");
     }
-    // Check for db being null
+
     if (!db) {
       redirect("/login?error=Database connection error. Please try again later.");
     }
