@@ -108,21 +108,25 @@ export default function RegisterPage({ searchParams }: { searchParams?: { succes
         <form action={action} className="flex flex-col gap-4">
           <input
             {...getInputProps(fields.email, { type: "email" })}
+            id="register-email"
             placeholder="Email"
-            required
             className="border rounded px-3 py-2"
+            aria-invalid={!!emailErrors?.[0]}
+            aria-describedby={emailErrors?.[0] ? "register-email-error" : undefined}
           />
           {!!emailErrors?.[0] && (
-            <div className="text-red-600 text-xs">{emailErrors[0]}</div>
+            <div id="register-email-error" className="text-red-600 text-xs">{emailErrors[0]}</div>
           )}
           <input
             {...getInputProps(fields.password, { type: "password" })}
+            id="register-password"
             placeholder="Password"
-            required
             className="border rounded px-3 py-2"
+            aria-invalid={!!passwordErrors?.[0]}
+            aria-describedby={passwordErrors?.[0] ? "register-password-error" : undefined}
           />
           {!!passwordErrors?.[0] && (
-            <div className="text-red-600 text-xs">{passwordErrors[0]}</div>
+            <div id="register-password-error" className="text-red-600 text-xs">{passwordErrors[0]}</div>
           )}
           <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2">
             Register
