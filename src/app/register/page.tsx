@@ -5,6 +5,10 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { useForm, type SubmissionResult } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { useFormState } from "react-dom";
+import { getInputProps } from "@conform-to/react";
+import { registerSchema } from "./registerSchema";
 
 function reply<T>(
   prevState: SubmissionResult<T>,
@@ -16,10 +20,6 @@ function reply<T>(
     status: result.error?.length ? "error" : "success",
   };
 }
-
-import { parseWithZod } from "@conform-to/zod";
-import { useFormState } from "react-dom";
-import { registerSchema } from "./registerSchema";
 
 const initialState: SubmissionResult<string[]> = {};
 
@@ -105,10 +105,9 @@ export default function RegisterPage({ searchParams }: { searchParams?: { succes
     <main className="flex flex-col items-center justify-center min-h-screen gap-8">
       <div className="max-w-md w-full">
         <h1 className="text-2xl font-bold mb-4">Register</h1>
-        <form {...form.props} action={action} className="flex flex-col gap-4">
+        <form action={action} className="flex flex-col gap-4">
           <input
-            {...fields.email.props}
-            type="email"
+            {...getInputProps(fields.email, { type: "email" })}
             placeholder="Email"
             required
             className="border rounded px-3 py-2"
@@ -117,8 +116,7 @@ export default function RegisterPage({ searchParams }: { searchParams?: { succes
             <div className="text-red-600 text-xs">{emailErrors[0]}</div>
           )}
           <input
-            {...fields.password.props}
-            type="password"
+            {...getInputProps(fields.password, { type: "password" })}
             placeholder="Password"
             required
             className="border rounded px-3 py-2"
