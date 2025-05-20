@@ -1,67 +1,51 @@
-import { db } from "@/db/connect";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
+"use client";
+import { useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
+import { z } from 'zod';
+import { register } from "./actions";
+import { useActionState } from "react";
 
-export default async function RegisterPage({ searchParams }: { searchParams?: { success?: string; error?: string } }) {
-  let message = "";
+export const schema = z.object({
+  email: z.string().email('Email is invalid'),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+});
 
-  const params = await searchParams;
-  if (params?.success) message = "Registration successful! You can now log in.";
-  if (params?.error) message = params.error;
-
-  async function handleRegister(formData: FormData) {
-    "use server";
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    if (!email || !password) {
-      redirect("/register?error=Email and password required.");
-    }
-    // Check for db being null
-    if (!db) {
-      redirect("/register?error=Database connection error. Please try again later.");
-    }
-    // Check if user already exists
-    const existing = await db.select().from(users).where(eq(users.email, email));
-    if (existing.length > 0) {
-      redirect("/register?error=User already exists.");
-    }
-    const passwordHash = await bcrypt.hash(password, 10);
-    await db.insert(users).values({
-      id: uuidv4(),
-      email,
-      passwordHash,
-    });
-    redirect("/register?success=1");
-  }
+export default function RegisterPage() {
+  const [lastResult, action] = useActionState(register, undefined);
+  const [form, fields] = useForm({
+    lastResult,
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema });
+    },
+    shouldValidate: 'onBlur',
+    shouldRevalidate: 'onInput',
+  });
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen gap-8">
       <div className="max-w-md w-full">
         <h1 className="text-2xl font-bold mb-4">Register</h1>
-        <form action={handleRegister} className="flex flex-col gap-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            className="border rounded px-3 py-2"
-          />
-          <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2">
+        {/* action={action} */}
+        <form id={form.id} onSubmit={form.onSubmit} method="post" className="flex flex-col gap-3">
+          <label htmlFor={fields.email.id}>Email</label>
+          <input type="email" {...fields.email} className="border rounded px-3 py-2" />
+          {fields.email.errors && (
+            <div className="text-red-600 text-xs italic" role="alert">
+              {fields.email.errors.join(', ')}
+            </div>
+          )}
+          <label htmlFor={fields.password.id}>Password</label>
+          <input type="password" {...fields.password} className="border rounded px-3 py-2" />
+          {fields.password.errors && (
+            <div className="text-red-600 text-xs italic" role="alert">
+              {fields.password.errors.join(', ')}
+            </div>
+          )}
+          <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2 mt-2">
             Register
           </button>
         </form>
-        {message && <div className="text-sm text-center mt-2">{message}</div>}
-      </div>
+      </div>  
     </main>
   );
 }

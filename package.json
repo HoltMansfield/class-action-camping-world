@@ -24,6 +24,8 @@
     "e2e:migrate": "node scripts/drizzle-e2e.cjs migrate"
   },
   "dependencies": {
+    "@conform-to/react": "^1.6.0",
+    "@conform-to/zod": "^1.6.0",
     "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-slot": "^1.2.0",
     "bcryptjs": "^3.0.2",
@@ -36,7 +38,7 @@
     "node-fetch": "^3.3.2",
     "pg": "^8.16.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.1.0",
     "tailwind-merge": "^3.2.0",
     "uuid": "^11.1.0",
     "ws": "^8.18.2"
