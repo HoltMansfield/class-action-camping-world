@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 import NavBar from "@/components/NavBar";
+import HighlightProvider from "@/components/HighlightProvider";
 
 export default function RootLayout({
   children,
@@ -22,7 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className}`}>
         <NavBar />
-        <Providers>{children}</Providers>
+        <HighlightProvider>
+          <Providers>{children}</Providers>
+        </HighlightProvider>
       </body>
     </html>
   );

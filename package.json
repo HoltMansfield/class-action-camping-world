@@ -24,6 +24,8 @@
     "e2e:migrate": "node scripts/drizzle-e2e.cjs migrate"
   },
   "dependencies": {
+    "@highlight-run/next": "^7.9.23",
+    "@highlight-run/node": "^3.12.7",
     "@hookform/resolvers": "^5.0.1",
     "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-slot": "^1.2.0",
