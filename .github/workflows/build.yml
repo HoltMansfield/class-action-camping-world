@@ -10,6 +10,7 @@ jobs:
   build:
     name: Build Next.js App
     runs-on: ubuntu-latest
+    environment: CI # this is where environment variables are set
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -1,4 +1,5 @@
 import { H } from "@highlight-run/node";
+import { env } from "@/env";
 
 H.init({
   projectID: "ney02ovd",
@@ -11,7 +12,7 @@ export function withHighlightError<Args extends unknown[], R>(
 ):
   (..._params: Args) => Promise<R> {
   return async (...params: Args): Promise<R> => {
-    if (process.env.APP_ENV === "E2E") {
+    if (env.APP_ENV === "E2E") {
       return await fn(...params);
     }
     try {
