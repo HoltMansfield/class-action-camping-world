@@ -1,0 +1,86 @@
+import * as yup from 'yup';
+
+// Define the environment schema
+const envSchema = yup.object({
+  // Node environment
+  NODE_ENV: yup.string()
+    .oneOf(['development', 'production', 'test', 'e2e'])
+    .default('development'),
+  // Application environment
+  APP_ENV: yup.string()
+    .oneOf(['LOCAL', 'E2E', 'PRODUCTION'])
+    .default('LOCAL'),
+  
+  // Server configuration
+  PORT: yup.number()
+    .default(3000),
+  
+  // Database configuration
+  DB_URL: yup.string()
+    .required('Database URL is required'),
+  MIGRATIONS_PATH: yup.string()
+    .default('./drizzle/migrations'),
+  
+  // Email service
+  RESEND_API_KEY: yup.string()
+    .when('APP_ENV', {
+      is: (env: string) => env !== 'E2E',
+      then: () => yup.string().required('Resend API key is required for non-E2E environments'),
+      otherwise: () => yup.string().default('noEmailsForE2E')
+    }),
+  
+  // Error tracking
+  HIGHLIGHT_API_KEY: yup.string()
+    .when('APP_ENV', {
+      is: 'PRODUCTION',
+      then: () => yup.string().required('Highlight API key is required for production'),
+      otherwise: () => yup.string().optional()
+    }),
+  
+  // Testing
+  E2E_URL: yup.string()
+    .when('APP_ENV', {
+      is: 'E2E',
+      then: () => yup.string().default('http://localhost:3001'),
+      otherwise: () => yup.string().optional()
+    }),
+  
+  // Debugging
+  DEBUG: yup.boolean()
+    .default(false),
+  
+  // Logging
+  LOG_LEVEL: yup.string()
+    .oneOf(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
+    .default('info'),
+});
+
+// Function to validate and parse environment variables
+function validateEnv() {
+  try {
+    // Cast and validate environment variables
+    const validatedEnv = envSchema.validateSync(process.env, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+    
+    return validatedEnv;
+  } catch (error) {
+    if (error instanceof yup.ValidationError) {
+      console.error('❌ Invalid environment variables:');
+      error.errors.forEach((err) => {
+        console.error(`  - ${err}`);
+      });
+    } else {
+      console.error('❌ Unknown error validating environment variables:', error);
+    }
+    
+    process.exit(1);
+  }
+}
+
+// Export the validated environment
+export const env = validateEnv();
+
+// Export type for type safety
+export type EnvVars = yup.InferType<typeof envSchema>;

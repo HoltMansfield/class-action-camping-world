@@ -3,6 +3,7 @@ import { H, withHighlightError } from "@/highlight-error";
 import { db } from "@/db/connect";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { env } from "@/env";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import * as yup from "yup";
@@ -40,7 +41,7 @@ async function _registerAction(
     passwordHash,
   });
 
-  if (process.env.APP_ENV !== "E2E") {
+  if (env.APP_ENV !== "E2E") {
     try {
       //await sendWelcomeEmail(email);
     } catch (error) {
