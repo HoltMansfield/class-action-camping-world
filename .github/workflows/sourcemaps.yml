@@ -11,7 +11,7 @@ on:
 jobs:
   upload-sourcemaps:
     runs-on: ubuntu-latest
-    environment: e2e
+    environment: CI # this is where environment variables are set
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
