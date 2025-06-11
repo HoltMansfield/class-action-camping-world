@@ -10,6 +10,8 @@ jobs:
     environment: e2e # this is where environment variables are set
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: E2E #the actual build step needs this, not the runing of the tests or migrations
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,10 +41,6 @@ jobs:
           echo "MIGRATIONS_PATH=${{ secrets.MIGRATIONS_PATH }}" >> .env.e2e
           echo "E2E_URL=${{ secrets.E2E_URL }}" >> .env.e2e
           chmod 600 .env.e2e
-
-        # use this for actual environment vars in my apps
-        # env:
-        #   DB_URL: ${{ secrets.DB_URL }}
 
       - name: Run E2E tests
         run: npm run test:e2e
