@@ -43,10 +43,9 @@ Possible values:
 
 ### Testing
 
-| Variable   | Description                                          | Used In                   |
-| ---------- | ---------------------------------------------------- | ------------------------- |
-| `E2E_URL`  | Base URL for E2E tests (e.g., http://localhost:3001) | Playwright configuration  |
-| `NODE_ENV` | Node.js environment (development, production, test)  | Various conditional logic |
+| Variable  | Description                                          | Used In                  |
+| --------- | ---------------------------------------------------- | ------------------------ |
+| `E2E_URL` | Base URL for E2E tests (e.g., http://localhost:3001) | Playwright configuration |
 
 ## Usage in Code
 
