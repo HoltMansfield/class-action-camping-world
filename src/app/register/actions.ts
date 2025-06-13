@@ -1,5 +1,6 @@
 "use server";
-import { H, withHighlightError } from "@/highlight-error";
+import { withHighlightError } from "@/highlight-error";
+import { H } from '@highlight-run/next/client';
 import { db } from "@/db/connect";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";

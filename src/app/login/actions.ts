@@ -1,5 +1,6 @@
 "use server";
 import { withHighlightError } from "@/highlight-error";
+import { H } from '@highlight-run/next/client';
 import { cookies } from "next/headers";
 import { db } from "@/db/connect";
 import { users } from "@/db/schema";
@@ -7,6 +8,7 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { MAX_FAILED_ATTEMPTS, LOCKOUT_DURATION_MS } from "./constants";
 import { redirect } from "next/navigation";
+import { env } from "@/env";
 
 async function _loginAction(
   state: { error?: string; success?: boolean } | undefined,
@@ -74,6 +76,12 @@ async function _loginAction(
   // Set session cookie
   const cookieStore = await cookies();
   cookieStore.set("session_user", user.email ?? "", { path: "/" });
+
+  if (env.APP_ENV !== "E2E" && env.APP_ENV !== "CI") {
+    if (user.email) {
+      H.identify(user.email);
+    }
+  }
   
   // Use server-side redirect instead of returning success
   redirect("/");
