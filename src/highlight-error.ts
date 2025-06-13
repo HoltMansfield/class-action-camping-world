@@ -24,5 +24,3 @@ export function withHighlightError<Args extends unknown[], R>(
     }
   };
 }
-
-export { H };

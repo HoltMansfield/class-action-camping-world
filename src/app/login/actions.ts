@@ -1,5 +1,6 @@
 "use server";
 import { withHighlightError } from "@/highlight-error";
+import { H } from '@highlight-run/next/client';
 import { cookies } from "next/headers";
 import { db } from "@/db/connect";
 import { users } from "@/db/schema";
@@ -74,6 +75,10 @@ async function _loginAction(
   // Set session cookie
   const cookieStore = await cookies();
   cookieStore.set("session_user", user.email ?? "", { path: "/" });
+
+  if (user.email) {
+    H.identify(user.email);
+  }
   
   // Use server-side redirect instead of returning success
   redirect("/");
